@@ -38,8 +38,8 @@ export const clearToken = () => localStorage.removeItem(TOKEN_KEY);
 
 function fallbackMessage(status, method, path) {
   if (status === 404) return `API route not found: ${method} ${path}. Check REACT_APP_API_URL points to the API root.`;
-  if (status === 401) return 'Authentication failed. Please sign in again.';
-  if (status === 403) return 'You do not have permission to perform this action.';
+  if (status === 401) return 'Invalid email or password or authentication required';
+  if (status === 403) return 'You do not have permission to perform this action';
   if (status === 400) return 'Invalid request. Please check your input.';
   if (status === 502 || status === 503 || status === 504) return 'The server is temporarily unavailable. Please try again later.';
   if (status >= 500) return 'Server error. Please try again later.';
@@ -57,7 +57,16 @@ async function request(method, path, body) {
     options.body = JSON.stringify(body);
   }
 
-  const response = await fetch(`${API_URL}${path}`, options);
+  let response;
+  try {
+    response = await fetch(`${API_URL}${path}`, options);
+  } catch (_netErr) {
+    const error = new Error('Unable to connect to the server');
+    error.status = 0;
+    error.data = { success: false, message: 'Unable to connect to the server' };
+    error.path = path;
+    throw error;
+  }
   let data = null;
   try {
     data = await response.json();
@@ -67,7 +76,7 @@ async function request(method, path, body) {
 
   if (!response.ok || data.success === false) {
     const serverMessage = data && data.message;
-    const isGeneric = !serverMessage || /something went wrong|invalid response from server|route not found/i.test(serverMessage);
+    const isGeneric = !serverMessage || /something went wrong|invalid response from server|route not found|unable to connect/i.test(serverMessage);
     const message = isGeneric ? fallbackMessage(response.status, method, path) : serverMessage;
     const error = new Error(message);
     error.status = response.status;
@@ -91,15 +100,28 @@ async function uploadFile(path, field, file, extra = {}) {
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const response = await fetch(`${API_URL}${path}`, {
-    method: 'POST',
-    headers,
-    credentials: 'include',
-    body: formData,
-  });
-  const data = await response.json();
+  let response;
+  try {
+    response = await fetch(`${API_URL}${path}`, {
+      method: 'POST',
+      headers,
+      credentials: 'include',
+      body: formData,
+    });
+  } catch (_netErr) {
+    const error = new Error('Unable to connect to the server');
+    error.status = 0;
+    error.data = { success: false, message: 'Unable to connect to the server' };
+    throw error;
+  }
+  let data;
+  try {
+    data = await response.json();
+  } catch (_err) {
+    data = { success: false, message: 'Invalid response from server' };
+  }
   if (!response.ok || data.success === false) {
-    const error = new Error(data.message || `Upload failed (${response.status})`);
+    const error = new Error(data.message && !/something went wrong|invalid response from server|route not found/i.test(data.message) ? data.message : `Upload failed (${response.status})`);
     error.status = response.status;
     error.data = data;
     throw error;
