@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Smartphone,
   ShieldCheck,
   CheckCircle2,
   Loader2,
