@@ -1,0 +1,15 @@
+{
+  "short_name": "Edson Shop",
+  "name": "Edson Shop - Everything You Need, In One Shop",
+  "icons": [
+    {
+      "src": "Logo.png",
+      "type": "image/png",
+      "sizes": "any"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

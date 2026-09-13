@@ -1,0 +1,11 @@
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { CreditCard, ArrowRight } from 'lucide-react';
+import { getMyPayments, formatPrice } from '../../services/api';
+
+const statusClass = { pending: 'bg-amber-100 text-amber-700', approved: 'bg-emerald-100 text-emerald-700', rejected: 'bg-rose-100 text-rose-700' };
+export default function Payments() {
+    const [state, setState] = useState({ loading: true, payments: [], error: '' });
+    useEffect(() => { getMyPayments().then((data) => setState({ loading: false, payments: data.payments || [], error: '' })).catch((error) => setState({ loading: false, payments: [], error: error.message })); }, []);
+    return <div className="container-site py-8 sm:py-12"><div className="flex items-center gap-3"><CreditCard className="text-brand-600" /><div><h1 className="font-display text-3xl font-bold text-slate-900">My Payments</h1><p className="mt-1 text-sm text-slate-500">Payment confirmations submitted for your orders.</p></div></div>{state.loading && <p className="mt-8 text-sm text-slate-500">Loading payments...</p>}{state.error && <p role="alert" className="mt-8 rounded-xl bg-rose-50 p-4 text-sm font-semibold text-rose-700">Unable to load payments. {state.error}</p>}{!state.loading && !state.error && <div className="mt-8 space-y-3">{state.payments.length ? state.payments.map((payment) => <Link key={payment.id} to={`/my-orders/${payment.order_id}`} className="card flex flex-wrap items-center justify-between gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-lift"><div><p className="font-semibold text-slate-800">{payment.order_number}</p><p className="text-xs text-slate-400">Submitted {new Date(payment.created_at).toLocaleDateString()}</p></div><span className={`badge ${statusClass[payment.status] || 'bg-slate-100 text-slate-600'}`}>{payment.status}</span><span className="font-bold text-slate-900">{formatPrice(Number(payment.amount))}</span><ArrowRight size={17} className="text-slate-400" /></Link>) : <div className="card p-10 text-center text-sm text-slate-500">No payment confirmations yet. <Link to="/shop" className="font-semibold text-brand-700">Start shopping</Link></div>}</div>}</div>;
+}
