@@ -3,8 +3,15 @@
 
   Architecture: React + Tailwind -> Node.js/Express REST API -> MySQL
 
-  The Express API lives in the sibling `edson-backend/` project
-  (http://localhost:5000/api). All functions below call the REST API.
+  The Express API lives in the sibling `edson-backend/` project. All functions
+  below call the REST API.
+
+  The backend base URL is configured through the centralized
+  `REACT_APP_API_URL` environment variable (see .env.local / .env.production).
+  It may be set with or without the `/api` prefix - the `resolveApiUrl`
+  helper below always appends it (e.g. https://host.example OR
+  https://host.example/api both become https://host.example/api).
+  When the variable is not set, it falls back to the local dev server.
 
   All catalogue, order, customer, and dashboard data comes from the API.
 
@@ -12,7 +19,13 @@
   `Authorization: Bearer <token>` (the backend also sets an httpOnly cookie).
 */
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+function resolveApiUrl() {
+  const raw = (process.env.REACT_APP_API_URL || 'http://localhost:5000').trim();
+  const base = raw.replace(/\/+$/, '');
+  return /\/api$/.test(base) ? base : `${base}/api`;
+}
+
+const API_URL = resolveApiUrl();
 const API_ORIGIN = API_URL.replace(/\/api\/?$/, '');
 
 const TOKEN_KEY = 'edson_token';
