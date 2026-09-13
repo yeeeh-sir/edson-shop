@@ -25,7 +25,13 @@ export default function AdminLogin() {
             if (!remember) sessionStorage.setItem('edson_admin_session', '1');
             navigate(location.state?.from || '/admin/dashboard', { replace: true });
         } catch (error) {
-            setStatus({ loading: false, error: error.message || 'Unable to sign in.' });
+            let message = error.message || 'Unable to sign in.';
+            const status = error.status;
+            if (status === 401) message = 'Invalid email or password.';
+            else if (status === 403) message = 'This sign-in is restricted to administrators.';
+            else if (status === 404) message = 'Admin login route was not found on the backend.';
+            else if (status >= 500) message = 'Server error. The backend may be down or the database may be unreachable.';
+            setStatus({ loading: false, error: message });
         }
     };
 

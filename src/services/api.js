@@ -36,6 +36,16 @@ export const clearToken = () => localStorage.removeItem(TOKEN_KEY);
 
 /* ---------- Low-level HTTP helper ---------- */
 
+function fallbackMessage(status, method, path) {
+  if (status === 404) return `API route not found: ${method} ${path}. Check REACT_APP_API_URL points to the API root.`;
+  if (status === 401) return 'Authentication failed. Please sign in again.';
+  if (status === 403) return 'You do not have permission to perform this action.';
+  if (status === 400) return 'Invalid request. Please check your input.';
+  if (status === 502 || status === 503 || status === 504) return 'The server is temporarily unavailable. Please try again later.';
+  if (status >= 500) return 'Server error. Please try again later.';
+  return `Request failed (${status})`;
+}
+
 async function request(method, path, body) {
   const headers = { Accept: 'application/json' };
   const token = getToken();
@@ -56,9 +66,13 @@ async function request(method, path, body) {
   }
 
   if (!response.ok || data.success === false) {
-    const error = new Error(data.message || `Request failed (${response.status})`);
+    const serverMessage = data && data.message;
+    const isGeneric = !serverMessage || /something went wrong|invalid response from server|route not found/i.test(serverMessage);
+    const message = isGeneric ? fallbackMessage(response.status, method, path) : serverMessage;
+    const error = new Error(message);
     error.status = response.status;
     error.data = data;
+    error.path = path;
     throw error;
   }
 
