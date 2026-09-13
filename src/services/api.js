@@ -179,6 +179,7 @@ export async function login(email, password) {
 
 export async function googleLogin(credential) {
   const res = await request('POST', '/auth/google', { credential });
+  setToken(res.data.token);
   return res.data.user;
 }
 

@@ -154,7 +154,7 @@ export default function Checkout() {
             <div className="mt-4 rounded-xl border border-brand-200 bg-brand-50 p-5 text-sm text-brand-900">
               <p className="font-bold">Send exactly {formatPrice(total)} using Mobile Money</p>
               <p className="mt-2">Payment number: <strong>+250 795 031 113</strong></p>
-              <p>Name: <strong>Edison Igiranza</strong></p>
+              <p>Name: <strong>Edson Igiranza</strong></p>
               <p className="mt-3 text-xs">Complete payment first, then upload your screenshot and submit the confirmation. Payment is manually verified by an administrator.</p>
             </div>
             <div className="mt-5 space-y-4">

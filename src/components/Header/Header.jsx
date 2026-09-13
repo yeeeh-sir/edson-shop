@@ -87,7 +87,7 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2" aria-label="Edson Shop home">
             <Logo className="h-12 w-12 lg:h-14 lg:w-14" />
-            <span className="hidden font-display text-lg font-bold tracking-tight text-white sm:block">Edison Shop</span>
+            <span className="hidden font-display text-lg font-bold tracking-tight text-white sm:block">Edson Shop</span>
           </Link>
 
           {/* Desktop nav */}
@@ -194,7 +194,7 @@ export default function Header() {
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <Link to="/" onClick={() => setDrawerOpen(false)} className="flex items-center gap-2">
                 <Logo className="h-12 w-12" />
-                <span className="font-display text-lg font-bold tracking-tight text-slate-900">Edison Shop</span>
+                <span className="font-display text-lg font-bold tracking-tight text-slate-900">Edson Shop</span>
               </Link>
               <button
                 type="button"

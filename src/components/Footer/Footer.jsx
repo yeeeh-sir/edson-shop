@@ -76,7 +76,7 @@ export default function Footer() {
           </div>
           <div className="mt-5 overflow-hidden rounded-2xl border border-slate-800/60">
             <iframe
-              title="Edison Shop location — Rubavu District, Rwanda"
+              title="Edson Shop location — Rubavu District, Rwanda"
               src="https://maps.google.com/maps?q=Rubavu%20District%2C%20Rwanda&output=embed"
               width="100%"
               height="160"
