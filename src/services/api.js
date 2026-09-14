@@ -446,9 +446,39 @@ export async function getBanners({ active = false } = {}) {
   return res.data.banners || [];
 }
 
-export async function createGraphicsRequest(payload) {
-  const res = await request('POST', '/graphics/requests', payload);
-  return res.data;
+export async function createGraphicsRequest({ fields = {}, file }) {
+  const formData = new FormData();
+  Object.entries(fields).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') formData.append(key, value);
+  });
+  if (file) formData.append('reference_image', file);
+
+  const headers = { Accept: 'application/json' };
+  const token = getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  let response;
+  try {
+    response = await fetch(`${API_URL}/graphics/requests`, {
+      method: 'POST',
+      headers,
+      credentials: 'include',
+      body: formData,
+    });
+  } catch (_netErr) {
+    const error = new Error('Unable to connect to the server');
+    error.status = 0;
+    error.data = { success: false, message: 'Unable to connect to the server' };
+    throw error;
+  }
+  const data = await response.json().catch(() => ({ success: false, message: 'Invalid response from server' }));
+  if (!response.ok || data.success === false) {
+    const error = new Error(data.message && !/something went wrong|invalid response from server|route not found/i.test(data.message) ? data.message : `Design request failed (${response.status})`);
+    error.status = response.status;
+    error.data = data;
+    throw error;
+  }
+  return data;
 }
 
 /* ---------- Graphics - Admin ---------- */
@@ -645,7 +675,20 @@ export const api = {
 
   async requestDesign(payload) {
     try {
-      await createGraphicsRequest(payload);
+      const images = Array.isArray(payload.images) ? payload.images : [];
+      const reference = images.find((i) => i.primary) || images[0] || null;
+      await createGraphicsRequest({
+        fields: {
+          customer_name: payload.fullName || '',
+          phone: payload.phone || '',
+          email: payload.email || '',
+          design_type: payload.designType || '',
+          size: payload.size || '',
+          quantity: payload.quantity || '',
+          description: payload.description || '',
+        },
+        file: reference && reference.file ? reference.file : null,
+      });
       return {
         success: true,
         requestId: `REQ-${Math.floor(10000 + Math.random() * 90000)}`,

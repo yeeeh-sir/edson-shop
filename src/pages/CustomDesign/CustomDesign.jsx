@@ -55,12 +55,14 @@ export default function CustomDesign() {
       return;
     }
     setSubmitting(true);
-    const res = await api.requestDesign({ ...form, images: images.map((i) => i.name) });
+    const res = await api.requestDesign({ ...form, images });
     setSubmitting(false);
     if (res.success) {
       setSuccess({ requestId: res.requestId });
       setForm(emptyForm);
       setImages([]);
+    } else {
+      setError(res.message || 'We could not submit your request. Please try again.');
     }
   };
 
@@ -154,7 +156,7 @@ export default function CustomDesign() {
           </div>
 
           <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
-            Frontend only — your request is not sent anywhere yet. It will connect to the future Node.js + Express + MySQL backend.
+            Images are uploaded securely to the cloud when you submit. Our design team reviews every request.
           </p>
 
           <button type="submit" disabled={submitting} className="btn-primary !w-full !py-4 text-base">
