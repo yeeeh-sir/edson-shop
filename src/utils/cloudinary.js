@@ -1,5 +1,5 @@
 /**
- * Cloudinary helpers for the Edson Shop frontend.
+ * Cloudinary helpers for the Edison Shop frontend.
  *
  * Product image URLs are stored on the server as full Cloudinary secure URLs
  * (e.g. https://res.cloudinary.com/<cloud>/image/upload/v<version>/<id>.<ext>).

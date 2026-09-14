@@ -112,13 +112,13 @@ export default function FilterSidebar({ filters, onChange, onReset }) {
 
       <section className="border-t border-slate-100 pt-5">
         <h4 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">
-          Maximum price — {formatPrice(filters.priceMax)}
+          Maximum price — {filters.priceMax > 0 ? formatPrice(filters.priceMax) : 'No limit'}
         </h4>
         <input
           type="range"
           min="0"
-          max="1200"
-          step="5"
+          max="1200000"
+          step="10000"
           value={filters.priceMax}
           onChange={(e) => onChange({ priceMax: Number(e.target.value) })}
           className="w-full accent-brand-600"

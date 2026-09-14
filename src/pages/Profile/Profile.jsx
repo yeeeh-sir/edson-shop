@@ -2,6 +2,10 @@ import React, { useRef, useState } from 'react';
 import { Save, UserRound, UploadCloud, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { updateProfile, uploadProfileImage } from '../../services/api';
+import Avatar from '../../components/Avatar/Avatar';
+
+const AVATAR_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const AVATAR_MAX_BYTES = 5 * 1024 * 1024;
 
 export default function Profile() {
     const { user, refreshUser } = useAuth();
@@ -13,6 +17,16 @@ export default function Profile() {
     const uploadAvatar = async (event) => {
         const file = event.target.files?.[0];
         if (!file) return;
+        if (!AVATAR_MIME_TYPES.includes(file.type)) {
+            setStatus({ saving: false, message: '', error: 'Only JPG, PNG or WEBP files are allowed.' });
+            event.target.value = '';
+            return;
+        }
+        if (file.size > AVATAR_MAX_BYTES) {
+            setStatus({ saving: false, message: '', error: 'Image is too large. Maximum size is 5 MB.' });
+            event.target.value = '';
+            return;
+        }
         setPreview(URL.createObjectURL(file));
         setStatus({ saving: true, message: '', error: '' });
         try {
@@ -52,16 +66,7 @@ export default function Profile() {
             <div>
                 <label className="label">Profile picture</label>
                 <div className="flex items-center gap-4">
-                    <div className="h-20 w-20 overflow-hidden rounded-full bg-slate-100 ring-2 ring-brand-100">
-                        {preview ? (
-                            <img src={preview} alt="Preview" className="h-full w-full object-cover" />
-                        ) : user.profile_image ? (
-                            <img src={user.profile_image} alt={user.full_name || 'Profile'} className="h-full w-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-                        ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-brand-50 text-brand-600"><UserRound size={32} /></div>
-                        )}
-                    </div>
-                    <div className="flex-1">
+                    <Avatar src={preview || user.profile_image} name={user.full_name || user.email} size={80} ring />                    <div className="flex-1">
                         <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={uploadAvatar} />
                         <button type="button" onClick={() => inputRef.current?.click()} disabled={status.saving} className="btn-ghost !py-2.5 disabled:cursor-not-allowed disabled:opacity-60">
                             {status.saving ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} />}

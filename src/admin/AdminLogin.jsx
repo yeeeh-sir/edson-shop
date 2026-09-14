@@ -41,7 +41,7 @@ export default function AdminLogin() {
             <div className="w-full max-w-md">
                 <div className="mb-8 text-center">
                     <Logo className="mx-auto h-24 w-24" />
-                    <h1 className="mt-5 font-display text-3xl font-bold text-white">Edson Shop Admin</h1>
+                    <h1 className="mt-5 font-display text-3xl font-bold text-white">Edison Shop Admin</h1>
                     <p className="mt-2 text-sm text-slate-400">Private operations console</p>
                 </div>
 

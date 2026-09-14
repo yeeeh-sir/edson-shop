@@ -317,7 +317,7 @@ export default function ProductDetails() {
               <div className="max-w-3xl space-y-4 text-slate-600">
                 <p>{p.description}</p>
                 <p>
-                  Every {p.isService ? 'design order' : 'product'} sold by Edson Shop is checked for quality before it reaches you.
+                  Every {p.isService ? 'design order' : 'product'} sold by Edison Shop is checked for quality before it reaches you.
                   Our {p.categoryName} range is selected for durability, value and great design.
                 </p>
                 <ul className="list-disc space-y-1 pl-5 text-sm">

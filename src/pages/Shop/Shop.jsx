@@ -21,7 +21,7 @@ const parseFilters = (params, routeCategory) => {
     q: params.get('q') || '',
     category: p,
     subcategory: params.get('subcategory') || 'all',
-    priceMax: Number(params.get('priceMax') || 1200000),
+    priceMax: Number(params.get('priceMax')) || 0,
     minRating: Number(params.get('rating') || 0),
     inStockOnly: params.get('inStock') === '1',
     sort: params.get('sort') || 'popular',
@@ -59,7 +59,7 @@ export default function Shop() {
         query: filters.q,
         category: currentCategory,
         subcategory: filters.subcategory,
-        priceMax: filters.priceMax,
+        priceMax: filters.priceMax || undefined,
         minRating: filters.minRating,
         inStockOnly: filters.inStockOnly,
         sort: filters.sort,
@@ -80,7 +80,7 @@ export default function Shop() {
     if (next.q) sp.set('q', next.q);
     if (currentCategory !== 'all') sp.set('category', currentCategory);
     if (next.subcategory !== 'all') sp.set('subcategory', next.subcategory);
-    if (next.priceMax !== 1200000) sp.set('priceMax', String(next.priceMax));
+    if (next.priceMax > 0) sp.set('priceMax', String(next.priceMax));
     if (next.minRating) sp.set('rating', String(next.minRating));
     if (next.inStockOnly) sp.set('inStock', '1');
     if (next.sort !== 'popular') sp.set('sort', next.sort);
@@ -89,7 +89,7 @@ export default function Shop() {
   };
 
   const resetFilters = () => {
-    updateFilter({ category: currentCategory === 'all' ? 'all' : currentCategory, subcategory: 'all', priceMax: 1200000, minRating: 0, inStockOnly: false });
+    updateFilter({ category: currentCategory === 'all' ? 'all' : currentCategory, subcategory: 'all', priceMax: 0, minRating: 0, inStockOnly: false });
   };
 
   const submitSearch = (e) => {
@@ -102,7 +102,7 @@ export default function Shop() {
   const activeCount = useMemo(() => {
     let n = 0;
     if (filters.subcategory !== 'all') n += 1;
-    if (filters.priceMax !== 1200) n += 1;
+    if (filters.priceMax > 0) n += 1;
     if (filters.minRating) n += 1;
     if (filters.inStockOnly) n += 1;
     if (filters.q) n += 1;
@@ -207,10 +207,10 @@ export default function Shop() {
                     </button>
                   </span>
                 )}
-                {filters.priceMax !== 1200000 && (
+                {filters.priceMax > 0 && (
                   <span className="badge border border-slate-200 bg-white text-slate-600">
                     Under {formatPrice(filters.priceMax)}
-                    <button type="button" onClick={() => updateFilter({ priceMax: 1200 })} aria-label="Clear price" className="ml-1 text-slate-400 hover:text-rose-500">
+                    <button type="button" onClick={() => updateFilter({ priceMax: 0 })} aria-label="Clear price" className="ml-1 text-slate-400 hover:text-rose-500">
                       <X size={12} />
                     </button>
                   </span>

@@ -29,11 +29,11 @@ export default function About() {
       <section className="bg-gradient-to-br from-[#050505] via-[#171717] to-brand-900 py-16 text-white">
         <div className="container-site text-center">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold backdrop-blur ring-1 ring-white/20">
-            <Users size={13} /> About Edson Shop
+            <Users size={13} /> About Edison Shop
           </span>
           <h1 className="mt-4 font-display text-4xl font-bold sm:text-5xl">Every Shop You Need, In One</h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-brand-100 sm:text-lg">
-            Edson Shop started with a simple idea: you shouldn’t have to hop between five stores to get what you
+            Edison Shop started with a simple idea: you shouldn’t have to hop between five stores to get what you
             need. Electronics, stationery, and a full design &amp; printing studio — under one roof.
           </p>
         </div>
@@ -79,7 +79,7 @@ export default function About() {
               'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80',
               'https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=600&q=80',
             ].map((src) => (
-              <img key={src} src={src} alt="Edson Shop work" loading="lazy" className="aspect-[4/3] w-full rounded-2xl object-cover shadow-card" />
+              <img key={src} src={src} alt="Edison Shop work" loading="lazy" className="aspect-[4/3] w-full rounded-2xl object-cover shadow-card" />
             ))}
           </div>
         </div>

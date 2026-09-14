@@ -31,9 +31,11 @@ export default function ProductImage({
 }) {
   const original = typeof src === 'string' && src.trim() ? src : '';
   const [stage, setStage] = useState(original ? 'image' : 'fallback');
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     setStage(original ? 'image' : 'fallback');
+    setLoaded(false);
   }, [original]);
 
   const variants = original ? getImageVariants(original, width) : null;
@@ -41,15 +43,12 @@ export default function ProductImage({
   const srcSet = variants ? variants.srcSet : undefined;
 
   const ratioClass = RATIO_CLASSES[ratio] || ratio || '';
-  const wrapperClass = [
-    'relative overflow-hidden bg-slate-100',
-    ratioClass,
-    className,
-  ].filter(Boolean).join(' ');
+  const wrapperClass = ['relative overflow-hidden bg-cream-200', ratioClass, className].filter(Boolean).join(' ');
 
   const imgClass = [
-    'h-full w-full',
+    'h-full w-full transition-opacity duration-500',
     cover ? 'object-cover' : 'object-contain',
+    loaded ? 'opacity-100' : 'opacity-0',
     imgClassName,
   ].filter(Boolean).join(' ');
 
@@ -65,7 +64,7 @@ export default function ProductImage({
   return (
     <div className={wrapperClass}>
       {stage === 'hidden' ? (
-        <div className="flex h-full w-full items-center justify-center text-slate-300">
+        <div className="flex h-full w-full items-center justify-center text-ink-200">
           <ImageOff size={Math.round(width / 6) || 20} />
         </div>
       ) : stage === 'image' && original ? (
@@ -75,6 +74,7 @@ export default function ProductImage({
           alt={alt}
           loading={lazy ? 'lazy' : 'eager'}
           onError={handleError}
+          onLoad={() => setLoaded(true)}
           className={imgClass}
         />
       ) : (
@@ -83,6 +83,7 @@ export default function ProductImage({
           alt={alt}
           loading={lazy ? 'lazy' : 'eager'}
           onError={handleError}
+          onLoad={() => setLoaded(true)}
           className={imgClass}
         />
       )}

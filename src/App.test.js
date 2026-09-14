@@ -4,7 +4,7 @@ import App from './App';
 import { CartProvider } from './context/CartContext';
 import { FavoritesProvider } from './context/FavoritesContext';
 
-test('renders Edson Shop homepage', () => {
+test('renders Edison Shop homepage', () => {
   render(
     <MemoryRouter>
       <FavoritesProvider>

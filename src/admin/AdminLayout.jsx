@@ -42,7 +42,7 @@ function Sidebar({ onNavigate }) {
       <div className="flex items-center gap-2.5 border-b border-slate-800 px-5 py-5">
         <Logo className="h-11 w-11" />
         <div>
-          <p className="font-display text-sm font-bold text-white">Edson Admin</p>
+          <p className="font-display text-sm font-bold text-white">Edison Admin</p>
           <p className="text-[10px] uppercase tracking-widest text-slate-500">Shop Manager</p>
         </div>
       </div>
@@ -166,7 +166,7 @@ function AdminLayoutInner() {
             </div>
             <button type="button" onClick={async () => { await logout(); window.location.href = '/admin/login'; }} className="ml-1 rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">Log out</button>
             <div className="hidden sm:block">
-              <p className="text-sm font-semibold text-slate-800">Edson Admin</p>
+              <p className="text-sm font-semibold text-slate-800">Edison Admin</p>
               <p className="text-[11px] text-slate-400">Super admin</p>
             </div>
           </div>

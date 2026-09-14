@@ -11,6 +11,10 @@ import {
   Tags,
   Palette,
   Camera,
+  PenTool,
+  Megaphone,
+  Shirt,
+  FileText,
 } from 'lucide-react';
 
 import CategoryCard from '../../components/CategoryCard/CategoryCard';
@@ -28,6 +32,22 @@ const whyUs = [
   { icon: Tags, title: 'Best Prices', text: 'Fair, competitive pricing with weekly deals and bundles.' },
   { icon: Clock, title: 'Quality Assured', text: 'Every product and print job is checked for quality before dispatch.' },
 ];
+
+const designServices = [
+  { icon: PenTool, title: 'Logo Design', desc: 'Memorable logos built around your brand.', keywords: ['logo'] },
+  { icon: Megaphone, title: 'Banner Design', desc: 'Bold banners for events, ads and sales.', keywords: ['banner'] },
+  { icon: Shirt, title: 'T-Shirt Printing', desc: 'Custom prints on quality tees, ready fast.', keywords: ['t-shirt', 'tshirt', 'shirt', 'print'] },
+  { icon: FileText, title: 'Posters & Flyers', desc: 'Print-ready posters and flyers, any size.', keywords: ['poster', 'flyer'] },
+];
+
+function matchServicePrice(products, keywords) {
+  const hit = (products || []).find(
+    (p) =>
+      keywords.some((k) => (p.name || '').toLowerCase().includes(k)) ||
+      keywords.some((k) => (p.subcategory || '').toLowerCase().includes(k)),
+  );
+  return hit && hit.price != null ? Number(hit.price) : null;
+}
 
 export default function Home() {
   const [categories, setCategories] = useState([]);
@@ -53,16 +73,24 @@ export default function Home() {
 
   return (
     <div>
-      
+      {/* Brand statement */}
+      <section className="border-b border-ink-100 bg-gradient-to-br from-cream-100 via-cream-50 to-white">
+        <div className="container-site py-8 text-center sm:py-10">
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-600">Welcome to</p>
+          <h1 className="mx-auto mt-2 font-display text-[6vw] font-black uppercase leading-[1.06] tracking-tight text-ink-900 sm:text-3xl lg:text-4xl">
+            Edison Cyber Papeterie<span className="text-brand-500">.</span>
+          </h1>
+          <p className="mx-auto mt-3 max-w-xl font-serif text-base italic text-brand-700 sm:text-lg">
+            Electronics · Stationery · Design &amp; Print
+          </p>
+          <p className="mx-auto mt-2 max-w-xl text-sm text-ink-500">
+            Everything you need under one roof — delivered fast across Rwanda.
+          </p>
+        </div>
+      </section>
 
       {/* Categories */}
       <section className="container-site py-16">
-        <SectionHeading
-          title="Shop by Category"
-          subtitle="Four departments, one goal — everything you need under one roof."
-          actionLabel="View all products"
-          actionTo="/shop"
-        />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
           {categories.map((c) => (
             <CategoryCard key={c.slug} category={c} />
@@ -163,38 +191,68 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Graphics promo */}
+      {/* Design & Print Studio */}
       <section className="container-site py-16">
-        <div className="card overflow-hidden bg-gradient-to-br from-[#050505] via-[#171717] to-brand-600 p-1">
-          <div className="rounded-2xl bg-white/95 p-6 sm:p-10">
-            <div className="flex flex-wrap items-center justify-between gap-6">
-              <div>
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-brand-600">
-                  <Palette size={14} /> Our design studio
-                </span>
-                <h2 className="mt-2 font-display text-2xl font-bold text-slate-900 sm:text-3xl">
-                  Banners · Logos · T-Shirts · Posters
-                </h2>
-                <p className="mt-2 max-w-xl text-sm text-slate-500">
-                  Professional design &amp; printing for brands, events and businesses. Live prices are shown in Rwandan francs.
-                </p>
-                <p className="mt-2 text-sm text-slate-500">
-                  Questions? Email us at{' '}
-                  <a href="mailto:edisonigiraneza@gmail.com" className="font-semibold text-brand-700 underline-offset-2 transition-colors hover:text-brand-500 hover:underline">
-                    edisonigiraneza@gmail.com
-                  </a>
-                </p>
-              </div>
+        <SectionHeading
+          title="Design & Print Studio"
+          subtitle="Custom design services — logos, banners, t-shirts, posters and more, printed to match your brand."
+          actionLabel="All design services"
+          actionTo="/graphics"
+        />
+        <div className="card overflow-hidden">
+          <div className="flex flex-wrap items-center justify-between gap-6 bg-gradient-to-r from-cream-50 to-white p-6 sm:p-10 border-t-4 border-brand-500">
+            <div>
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-brand-700">
+                <Palette size={14} /> Our design studio
+              </span>
+              <h2 className="mt-2 font-display text-2xl font-bold text-ink-900 sm:text-3xl">
+                From idea to print — in one place
+              </h2>
+              <p className="mt-2 max-w-xl text-sm text-ink-500">
+                Send us your idea, get a professional design and receive it printed, fast. Live prices are shown in Rwandan francs.
+              </p>
+              <p className="mt-2 text-sm text-ink-500">
+                Questions? Email us at{' '}
+                <a href="mailto:edisonigiraneza@gmail.com" className="font-semibold text-brand-700 underline-offset-2 transition-colors hover:text-brand-500 hover:underline">
+                  edisonigiraneza@gmail.com
+                </a>
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
               <Link to="/graphics" className="btn-primary !px-6 !py-3">
                 Explore Graphics Studio
                 <ArrowRight size={17} />
               </Link>
+              <Link to="/graphics/request" className="btn-accent !px-6 !py-3">
+                Request a design
+              </Link>
             </div>
+          </div>
 
-            <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 border-t border-ink-100 bg-cream-50 p-6 sm:grid-cols-2 sm:p-10 lg:grid-cols-4">
+            {designServices.map((s) => {
+              const Icon = s.icon;
+              const price = matchServicePrice(graphics, s.keywords);
+              return (
+                <Link key={s.title} to="/graphics" className="group rounded-2xl bg-white p-6 ring-1 ring-ink-900/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift hover:ring-brand-400/60">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-colors duration-300 group-hover:bg-brand-500 group-hover:text-white">
+                    <Icon size={20} />
+                  </span>
+                  <h3 className="mt-4 font-display text-base font-semibold text-ink-900">{s.title}</h3>
+                  <p className="mt-1 text-[13px] leading-relaxed text-ink-500">{s.desc}</p>
+                  <p className="mt-3 text-sm font-bold text-brand-700">
+                    {price != null ? <>From {formatPrice(price)}</> : <span className="font-medium text-ink-400">Request a quote</span>}
+                  </p>
+                </Link>
+              );
+            })}
+          </div>
+
+          {graphics.length > 0 && (
+            <div className="grid grid-cols-1 gap-5 border-t border-ink-100 p-6 sm:grid-cols-2 sm:p-10 lg:grid-cols-4">
               {graphics.map((g) => (
-                <Link key={g.id} to={`/product/${g.id}`} className="group overflow-hidden rounded-xl border border-slate-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
-                  <div className="relative aspect-[4/3] overflow-hidden">
+                <Link key={g.id} to={`/product/${g.id}`} className="group overflow-hidden rounded-xl border border-ink-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-cream-200">
                     <img
                       src={g.image}
                       alt={g.name}
@@ -207,13 +265,13 @@ export default function Home() {
                     </span>
                   </div>
                   <div className="p-4">
-                    <h3 className="font-display text-sm font-bold text-slate-900 group-hover:text-brand-700">{g.name}</h3>
-                    <p className="mt-0.5 text-xs text-slate-400">{g.subcategory}</p>
+                    <h3 className="font-display text-sm font-bold text-ink-900 group-hover:text-brand-700">{g.name}</h3>
+                    <p className="mt-0.5 text-xs text-ink-400">{g.subcategory}</p>
                   </div>
                 </Link>
               ))}
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -221,7 +279,7 @@ export default function Home() {
       <section className="bg-slate-950 py-16 text-white">
         <div className="container-site">
           <div className="mb-10 text-center">
-            <h2 className="font-display text-2xl font-bold sm:text-3xl">Why Choose Edson Shop?</h2>
+            <h2 className="font-display text-2xl font-bold sm:text-3xl">Why Choose Edison Shop?</h2>
             <p className="mx-auto mt-2 max-w-xl text-sm text-slate-400">
               Built to make shopping simple, fast and reliable for every customer.
             </p>

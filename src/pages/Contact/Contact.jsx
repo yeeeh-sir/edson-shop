@@ -12,7 +12,7 @@ export default function Contact() {
 
   const whatsappNumber = settings.phone.replace(/\D/g, '');
   const whatsappMessage = encodeURIComponent(
-    `Hello Edson Shop, my name is ${form.name || '[Your name]'}. ${form.email ? `My email is ${form.email}. ` : ''}${form.subject ? `Subject: ${form.subject}. ` : ''}${form.message || 'I would like to ask about your products.'}`
+    `Hello Edison Shop, my name is ${form.name || '[Your name]'}. ${form.email ? `My email is ${form.email}. ` : ''}${form.subject ? `Subject: ${form.subject}. ` : ''}${form.message || 'I would like to ask about your products.'}`
   );
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 

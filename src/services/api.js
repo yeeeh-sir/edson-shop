@@ -1,5 +1,5 @@
 /*
-  Edson Shop - API client
+  Edison Shop - API client
 
   Architecture: React + Tailwind -> Node.js/Express REST API -> MySQL
 
@@ -428,6 +428,11 @@ export async function rejectPayment(id, admin_note) {
   return res.data.payment;
 }
 
+export async function deletePayment(id) {
+  const res = await request('DELETE', `/admin/payments/${id}`);
+  return res.data;
+}
+
 /* ---------- Graphics ---------- */
 
 export async function getGraphicsServices() {
@@ -603,6 +608,10 @@ export async function getAdminUsers({ search, page = 1, limit = 20 } = {}) {
   return res.data;
 }
 
+export async function deleteUser(id) {
+  return request('DELETE', `/admin/users/${id}`);
+}
+
 export const api = {
   getCategories,
 
@@ -666,7 +675,7 @@ export const api = {
       return {
         success: true,
         orderId: order.order_number,
-        message: 'Order received! Thank you for shopping with Edson.',
+        message: 'Order received! Thank you for shopping with Edison.',
       };
     } catch (err) {
       return { success: false, orderId: null, message: err.message };

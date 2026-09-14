@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Trash2, Download, Home, Tag, ImagePlus, Loader2 } from 'lucide-react';
 import Icon from '../components/IconSet';
+import { getCategoryImage } from '../utils/categoryImages';
 import { addCategory, deleteCategory, getAdminCategories, updateCategoryStatus, uploadCategoryImage } from '../services/api';
 
 export default function Categories() {
@@ -94,8 +95,8 @@ export default function Categories() {
           return (
             <div key={c.slug} className={`card overflow-hidden transition-all ${c.active ? '' : 'opacity-60'}`}>
               <div className="relative h-28">
-                {c.image && <img src={c.image} alt={c.name} loading="lazy" className="h-full w-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
+                {<img src={getCategoryImage(c)} alt={c.name} loading="lazy" className="h-full w-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />}
+                <div className="absolute inset-0 bg-gradient-to-t from-ink-900/70 to-transparent" />
                 <span className="absolute bottom-3 left-4 flex h-9 w-9 items-center justify-center rounded-lg bg-white/95 text-brand-600">
                   <Icon name={c.icon} size={18} />
                 </span>

@@ -59,7 +59,7 @@ export default function Dashboard() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold text-slate-900">Dashboard</h1>
-          <p className="mt-1 text-sm text-slate-500">Overview of Edson Shop — {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <p className="mt-1 text-sm text-slate-500">Overview of Edison Shop — {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
         <Link to="/admin/products/add" className="btn-primary">
           <Plus size={16} /> Add product

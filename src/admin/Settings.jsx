@@ -4,7 +4,7 @@ import { getStoreSettings, updateStoreSettings, getBanners, createBanner, update
 
 export default function Settings() {
   const [form, setForm] = useState({
-    shopName: 'Edson Shop',
+    shopName: 'Edison Shop',
     tagline: 'Everything You Need, In One Shop',
     currency: 'RWF',
     deliveryFee: '5000',

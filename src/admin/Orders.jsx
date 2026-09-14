@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Eye, Search, Maximize2, ImageOff, X } from 'lucide-react';
-import { getAdminPayments, approvePayment, rejectPayment } from '../services/api';
+import { Eye, Search, Maximize2, ImageOff, X, Trash2 } from 'lucide-react';
+import { getAdminPayments, approvePayment, rejectPayment, deletePayment } from '../services/api';
 import { formatPrice } from '../services/api';
 import { cloudinaryVariant } from '../utils/cloudinary';
 
@@ -29,6 +29,15 @@ export default function Orders() {
       const updated = approved ? await approvePayment(payment.id, note) : await rejectPayment(payment.id, note);
       setRows((prev) => prev.map((item) => item.id === payment.id ? { ...item, ...updated } : item));
     } catch (reviewError) { setError(reviewError.message); }
+  };
+
+  const remove = async (payment) => {
+    if (!window.confirm(`Delete payment history for ${payment.order_number}?\nThis permanently removes the record and its screenshot.`)) return;
+    try {
+      await deletePayment(payment.id);
+      setRows((prev) => prev.filter((item) => item.id !== payment.id));
+      if (viewing && viewing.id === payment.id) setViewing(null);
+    } catch (deleteError) { setError(deleteError.message); }
   };
 
   const list = rows.filter(
@@ -123,6 +132,9 @@ export default function Orders() {
                     <button type="button" onClick={() => setViewing(o)} className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-brand-600" aria-label={`View ${o.order_number}`}>
                       <Eye size={16} />
                     </button>
+                    <button type="button" onClick={() => remove(o)} className="rounded-lg p-2 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600" aria-label={`Delete payment ${o.order_number}`} title="Delete payment history">
+                      <Trash2 size={16} />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -169,7 +181,12 @@ export default function Orders() {
               ))}
             </dl>
             {viewing.admin_note && <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">Admin note: {viewing.admin_note}</p>}
-            <button type="button" onClick={() => setViewing(null)} className="btn-primary mt-5 !w-full">Close</button>
+            <div className="mt-5 flex gap-3">
+              <button type="button" onClick={() => remove(viewing)} className="inline-flex items-center gap-2 rounded-lg border border-rose-200 bg-white px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-50">
+                <Trash2 size={15} /> Delete
+              </button>
+              <button type="button" onClick={() => setViewing(null)} className="btn-primary flex-1 !m-0">Close</button>
+            </div>
           </div>
         </div>
       )}
