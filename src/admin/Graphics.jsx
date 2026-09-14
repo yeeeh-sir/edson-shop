@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import {
-  Palette,
   Search,
   Clock,
   CheckCircle2,
@@ -12,7 +11,6 @@ import {
   Mail,
   Phone,
   Calendar,
-  Image as ImageIcon,
   ImageOff,
   ChevronRight,
   RefreshCw,
@@ -22,7 +20,7 @@ import {
   FileText,
   Star,
 } from 'lucide-react';
-import { getAdminGraphicsRequests, updateGraphicsRequestStatus, formatPrice } from '../services/api';
+import { getAdminGraphicsRequests, updateGraphicsRequestStatus } from '../services/api';
 import { cloudinaryVariant } from '../utils/cloudinary';
 
 const STATUSES = [
@@ -220,7 +218,7 @@ function DetailModal({ request, onClose, onUpdate }) {
               {images.length > 0 && !imgError ? (
                 <img
                   src={cloudinaryVariant(images[activeImage], 1200)}
-                  alt={`Reference image for request #${request.id}`}
+                  alt={`Reference for ${request.design_type || request.service_name || `request #${request.id}`}`}
                   className="h-full w-full object-contain"
                   onError={() => setImgError(true)}
                 />
