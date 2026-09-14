@@ -2,11 +2,10 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, ShoppingCart, Eye } from 'lucide-react';
 import Rating from '../Rating/Rating';
+import ProductImage from '../ProductImage/ProductImage';
 import { useCart } from '../../context/CartContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { formatPrice } from '../../services/api';
-
-const FALLBACK = `${process.env.PUBLIC_URL}/images/fallback.svg`;
 
 export default function ProductCard({ product }) {
   const { addItem } = useCart();
@@ -26,15 +25,14 @@ export default function ProductCard({ product }) {
 
   return (
     <article className="group card relative flex flex-col overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lift">
-      <Link to={`/product/${product.id}`} className="relative block aspect-square overflow-hidden bg-slate-100">
-        <img
+      <Link to={`/product/${product.id}`} className="relative block">
+        <ProductImage
           src={product.image}
           alt={product.name}
-          loading="lazy"
-          onError={(e) => {
-            e.currentTarget.src = FALLBACK;
-          }}
-          className="h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+          width={480}
+          ratio="square"
+          cover
+          imgClassName="transition-transform duration-500 ease-in-out group-hover:scale-110"
         />
         <div className="absolute left-3 top-3 flex flex-col gap-2">
           {product.discount > 0 && (

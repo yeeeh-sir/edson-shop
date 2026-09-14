@@ -179,6 +179,9 @@ export async function login(email, password) {
 
 export async function googleLogin(credential) {
   const res = await request('POST', '/auth/google', { credential });
+  if (!res.data || !res.data.token) {
+    throw new Error('Google login did not return an authentication token. Please try again.');
+  }
   setToken(res.data.token);
   return res.data.user;
 }
@@ -432,6 +435,11 @@ export async function getGraphicsServices() {
   return res.data.services;
 }
 
+export async function getGraphicsService(id) {
+  const res = await request('GET', `/graphics/${id}`);
+  return res.data.service;
+}
+
 export async function getBanners({ active = false } = {}) {
   const query = active ? '?active=1' : '';
   const res = await request('GET', `/banners${query}`);
@@ -441,6 +449,18 @@ export async function getBanners({ active = false } = {}) {
 export async function createGraphicsRequest(payload) {
   const res = await request('POST', '/graphics/requests', payload);
   return res.data;
+}
+
+/* ---------- Graphics - Admin ---------- */
+
+export async function getAdminGraphicsRequests() {
+  const res = await request('GET', '/graphics/requests');
+  return res.data.requests || [];
+}
+
+export async function updateGraphicsRequestStatus(id, status) {
+  const res = await request('PATCH', `/graphics/requests/${id}/status`, { status });
+  return res.data.request;
 }
 
 /* ---------- Contact ---------- */

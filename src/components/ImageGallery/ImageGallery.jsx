@@ -1,42 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, ImageOff } from 'lucide-react';
-
-const FALLBACK = `${process.env.PUBLIC_URL}/images/fallback.svg`;
+import ProductImage from '../ProductImage/ProductImage';
 
 export default function ImageGallery({ images = [], name = 'Product' }) {
   const [active, setActive] = useState(0);
   const [error, setError] = useState(false);
 
-  const list = images.length ? images : [FALLBACK];
+  const list = (images || []).filter(Boolean).length ? images.filter(Boolean) : [];
 
   useEffect(() => {
     setActive(0);
     setError(false);
   }, [images]);
 
-  const onError = () => setError(true);
-  const src = error ? FALLBACK : list[active] || FALLBACK;
+  const shown = list.filter(Boolean);
+  const src = (shown.length ? shown[active % shown.length] : '') || '';
 
-  const prev = () => setActive((a) => (a - 1 + list.length) % list.length);
-  const next = () => setActive((a) => (a + 1) % list.length);
+  const prev = () => setActive((a) => (a - 1 + shown.length) % shown.length);
+  const next = () => setActive((a) => (a + 1) % shown.length);
 
   return (
     <div>
-      <div className="relative aspect-square overflow-hidden rounded-2xl bg-slate-100 ring-1 ring-slate-900/5">
-        <img
+      <div className="relative overflow-hidden rounded-2xl ring-1 ring-slate-900/5">
+        <ProductImage
           src={src}
           alt={name}
-          className="h-full w-full object-cover"
-          onError={onError}
-          loading="eager"
+          width={900}
+          ratio="square"
+          cover
+          lazy={false}
+          onErrorChange={(t) => setError(t === 'error')}
         />
-        {list.length > 1 && (
+        {shown.length > 1 && (
           <>
             <button
               type="button"
               onClick={prev}
               aria-label="Previous image"
-              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-slate-700 shadow-md transition hover:bg-white"
+              className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2 text-slate-700 shadow-md transition hover:bg-white"
             >
               <ChevronLeft size={20} />
             </button>
@@ -44,14 +45,14 @@ export default function ImageGallery({ images = [], name = 'Product' }) {
               type="button"
               onClick={next}
               aria-label="Next image"
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-slate-700 shadow-md transition hover:bg-white"
+              className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2 text-slate-700 shadow-md transition hover:bg-white"
             >
               <ChevronRight size={20} />
             </button>
           </>
         )}
         {error && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div className="flex flex-col items-center gap-2 text-slate-400">
               <ImageOff size={32} />
               <span className="text-xs">Image unavailable</span>
@@ -59,9 +60,9 @@ export default function ImageGallery({ images = [], name = 'Product' }) {
           </div>
         )}
       </div>
-      {list.length > 1 && (
+      {shown.length > 1 && (
         <div className="mt-4 flex gap-3 overflow-x-auto pb-1 scrollbar-none">
-          {list.map((img, i) => (
+          {shown.map((img, i) => (
             <button
               type="button"
               key={i}
@@ -71,14 +72,12 @@ export default function ImageGallery({ images = [], name = 'Product' }) {
                 i === active ? 'ring-brand-500' : 'ring-transparent hover:ring-slate-300'
               }`}
             >
-              <img
+              <ProductImage
                 src={img}
                 alt={`${name} thumbnail ${i + 1}`}
-                className="h-full w-full object-cover"
-                loading="lazy"
-                onError={(e) => {
-                  e.currentTarget.src = FALLBACK;
-                }}
+                width={160}
+                ratio="square"
+                cover
               />
             </button>
           ))}

@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Eye, Search } from 'lucide-react';
+import { Eye, Search, Maximize2, ImageOff, X } from 'lucide-react';
 import { getAdminPayments, approvePayment, rejectPayment } from '../services/api';
 import { formatPrice } from '../services/api';
+import { cloudinaryVariant } from '../utils/cloudinary';
 
 const STATUSES = ['all', 'pending', 'approved', 'rejected', 'processing', 'shipped', 'delivered'];
+
+const thumbnail = (url) => cloudinaryVariant(url, 96);
+const fullImage = (url) => cloudinaryVariant(url, 1600);
 
 export default function Orders() {
   const [rows, setRows] = useState([]);
@@ -62,7 +66,7 @@ export default function Orders() {
 
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] text-sm">
+          <table className="w-full min-w-[820px] text-sm">
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs font-bold uppercase tracking-wider text-slate-400">
                 <th className="px-5 py-3">Order</th>
@@ -71,7 +75,7 @@ export default function Orders() {
                 <th className="px-5 py-3">Date</th>
                 <th className="px-5 py-3">Total</th>
                 <th className="px-5 py-3">Payment</th>
-                <th className="px-5 py-3">Order status</th>
+                <th className="px-5 py-3">Screenshot</th>
                 <th className="px-5 py-3">Review</th>
                 <th className="px-5 py-3 text-right">View</th>
               </tr>
@@ -85,7 +89,33 @@ export default function Orders() {
                   <td className="px-5 py-3 text-slate-500">{new Date(o.created_at).toLocaleDateString()}</td>
                   <td className="px-5 py-3 font-bold text-slate-800">{formatPrice(Number(o.amount))}</td>
                   <td className="px-5 py-3 text-slate-500"><span className={`badge ${o.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : o.status === 'rejected' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>{o.status}</span><p className="mt-1 text-xs">{o.transaction_reference || 'No reference'}</p></td>
-                  <td className="px-5 py-3 text-slate-500">{o.order_status}</td>
+                  <td className="px-5 py-3">
+                    <button
+                      type="button"
+                      onClick={() => setViewing(o)}
+                      className="group relative block h-14 w-14 overflow-hidden rounded-lg border border-slate-200 bg-slate-100"
+                      aria-label={`View screenshot for ${o.order_number}`}
+                      title="View screenshot"
+                    >
+                      {o.screenshot_url ? (
+                        <img
+                          src={thumbnail(o.screenshot_url)}
+                          alt={`Payment screenshot for ${o.order_number}`}
+                          loading="lazy"
+                          className="h-full w-full object-cover transition group-hover:scale-105"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
+                      ) : null}
+                      <span className="absolute inset-0 flex items-center justify-center bg-slate-900/0 opacity-0 transition group-hover:bg-slate-900/40 group-hover:opacity-100">
+                        <Maximize2 size={16} className="text-white" />
+                      </span>
+                      {!o.screenshot_url && (
+                        <span className="absolute inset-0 flex items-center justify-center text-slate-300">
+                          <ImageOff size={20} />
+                        </span>
+                      )}
+                    </button>
+                  </td>
                   <td className="px-5 py-3">
                     {o.status === 'pending' && <div className="flex gap-2"><button type="button" onClick={() => review(o, true)} className="rounded-lg bg-emerald-600 px-2 py-1 text-xs font-bold text-white">Approve</button><button type="button" onClick={() => review(o, false)} className="rounded-lg bg-rose-600 px-2 py-1 text-xs font-bold text-white">Reject</button></div>}
                   </td>
@@ -102,9 +132,34 @@ export default function Orders() {
       </div>
 
       {viewing && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Order details">
-          <div className="w-full max-w-md animate-scale-in rounded-2xl bg-white p-6 shadow-lift">
-            <h3 className="font-display text-lg font-bold text-slate-900">Payment for {viewing.order_number}</h3>
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Order details" onClick={() => setViewing(null)}>
+          <div className="max-h-[90vh] w-full max-w-lg animate-scale-in overflow-y-auto rounded-2xl bg-white p-6 shadow-lift" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="font-display text-lg font-bold text-slate-900">Payment for {viewing.order_number}</h3>
+              <button type="button" onClick={() => setViewing(null)} className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600" aria-label="Close">
+                <X size={18} />
+              </button>
+            </div>
+
+            {viewing.screenshot_url ? (
+              <button type="button" className="mt-4 block w-full" onClick={() => window.open(viewing.screenshot_url, '_blank', 'noopener,noreferrer')} title="Open full screenshot in new tab">
+                <img
+                  src={fullImage(viewing.screenshot_url)}
+                  alt="Payment screenshot"
+                  className="max-h-[50vh] w-full rounded-xl bg-slate-100 object-contain"
+                  loading="lazy"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+                <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600">
+                  <Maximize2 size={13} /> Open full screenshot
+                </span>
+              </button>
+            ) : (
+              <div className="mt-4 flex h-40 items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-400">
+                <span className="flex items-center gap-2"><ImageOff size={18} /> Screenshot unavailable</span>
+              </div>
+            )}
+
             <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
               {[['Customer', viewing.full_name], ['Email', viewing.email], ['Phone', viewing.phone], ['Product', viewing.products], ['Date', new Date(viewing.created_at).toLocaleDateString()], ['Amount', formatPrice(Number(viewing.amount))], ['Payment', viewing.status], ['Reference', viewing.transaction_reference || 'None']].map(([k, v]) => (
                 <div key={k}>
@@ -113,7 +168,6 @@ export default function Orders() {
                 </div>
               ))}
             </dl>
-            {viewing.screenshot_url && <img src={viewing.screenshot_url} alt="Payment screenshot" className="mt-4 max-h-80 w-full rounded-xl object-contain bg-slate-100" />}
             {viewing.admin_note && <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">Admin note: {viewing.admin_note}</p>}
             <button type="button" onClick={() => setViewing(null)} className="btn-primary mt-5 !w-full">Close</button>
           </div>

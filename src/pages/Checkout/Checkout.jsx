@@ -5,6 +5,10 @@ import {
   CheckCircle2,
   Loader2,
   ArrowLeft,
+  ImagePlus,
+  X,
+  UploadCloud,
+  AlertCircle,
 } from 'lucide-react';
 import CartSummary from '../../components/CartSummary/CartSummary';
 import EmptyState from '../../components/EmptyState/EmptyState';
@@ -20,6 +24,9 @@ const emptyForm = {
   fullName: '', phone: '', email: '', address: '', city: '', country: 'Rwanda', notes: '',
 };
 
+const MAX_SCREENSHOT_SIZE = 5 * 1024 * 1024;
+const SCREENSHOT_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
 export default function Checkout() {
   const { items, subtotal, delivery, total, clear } = useCart();
   const { user } = useAuth();
@@ -28,9 +35,11 @@ export default function Checkout() {
   const [paymentNumber, setPaymentNumber] = useState('');
   const [transactionReference, setTransactionReference] = useState('');
   const [screenshot, setScreenshot] = useState(null);
+  const [screenshotPreview, setScreenshotPreview] = useState('');
   const [placing, setPlacing] = useState(false);
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState('');
+  const [screenshotError, setScreenshotError] = useState('');
 
   React.useEffect(() => {
     if (!user) return;
@@ -45,7 +54,36 @@ export default function Checkout() {
     }));
   }, [user]);
 
+  React.useEffect(() => {
+    return () => {
+      if (screenshotPreview) URL.revokeObjectURL(screenshotPreview);
+    };
+  }, [screenshotPreview]);
+
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+
+  const handleScreenshotChange = (file) => {
+    setScreenshotError('');
+    if (!file) {
+      setScreenshot(null);
+      setScreenshotPreview('');
+      return;
+    }
+    if (!SCREENSHOT_TYPES.includes(file.type)) {
+      setScreenshotError('Only JPG, PNG or WEBP images are allowed.');
+      setScreenshot(null);
+      setScreenshotPreview('');
+      return;
+    }
+    if (file.size > MAX_SCREENSHOT_SIZE) {
+      setScreenshotError('Screenshot is too large. Maximum size is 5MB.');
+      setScreenshot(null);
+      setScreenshotPreview('');
+      return;
+    }
+    setScreenshot(file);
+    setScreenshotPreview(URL.createObjectURL(file));
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -60,6 +98,10 @@ export default function Checkout() {
     }
     if (!screenshot) {
       setError('Please upload your payment screenshot.');
+      return;
+    }
+    if (!screenshotPreview) {
+      setError('Upload is still processing. Please wait a moment and try again.');
       return;
     }
     setPlacing(true);
@@ -160,7 +202,58 @@ export default function Checkout() {
             <div className="mt-5 space-y-4">
               <div><label className="label" htmlFor="paymentNumber">Number used for payment</label><input id="paymentNumber" className={inputCls} value={paymentNumber} onChange={(e) => setPaymentNumber(e.target.value)} placeholder="+250 ..." required /></div>
               <div><label className="label" htmlFor="transactionReference">Transaction reference (optional)</label><input id="transactionReference" className={inputCls} value={transactionReference} onChange={(e) => setTransactionReference(e.target.value)} /></div>
-              <div><label className="label" htmlFor="paymentScreenshot">Payment screenshot *</label><input id="paymentScreenshot" type="file" accept="image/jpeg,image/png,image/webp" className={inputCls} onChange={(e) => setScreenshot(e.target.files?.[0] || null)} required /><p className="mt-1 text-xs text-slate-400">JPG, PNG or WEBP only. Never upload PINs, passwords, or OTPs.</p></div>
+              <div>
+                <label className="label" htmlFor="paymentScreenshot">Payment screenshot *</label>
+                {screenshot === null ? (
+                  <label
+                    htmlFor="paymentScreenshot"
+                    className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-brand-300 bg-brand-50/50 px-5 py-7 text-center transition hover:border-brand-500 hover:bg-brand-50"
+                  >
+                    <UploadCloud size={26} className="text-brand-600" />
+                    <input
+                      id="paymentScreenshot"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="sr-only"
+                      onChange={(e) => handleScreenshotChange(e.target.files?.[0] || null)}
+                      disabled={placing}
+                    />
+                    <span className="text-sm font-semibold text-brand-700">Click to upload your screenshot</span>
+                    <span className="text-xs text-slate-400">JPG, PNG or WEBP · max 5MB</span>
+                  </label>
+                ) : (
+                  <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                    <div className="relative bg-slate-100">
+                      <img src={screenshotPreview} alt="Payment screenshot preview" className="max-h-64 w-full bg-slate-100 object-contain" />
+                      <span className="absolute left-3 top-3 rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white">Selected</span>
+                      <button
+                        type="button"
+                        onClick={() => { setScreenshot(null); setScreenshotPreview(''); }}
+                        disabled={placing}
+                        className="absolute right-3 top-3 rounded-full bg-slate-900/70 p-1.5 text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-label="Remove screenshot"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 px-4 py-3">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <ImagePlus size={16} className="shrink-0 text-brand-600" />
+                        <span className="truncate text-sm font-medium text-slate-700">{screenshot.name}</span>
+                      </div>
+                      <span className="shrink-0 text-xs text-slate-400">
+                        {(screenshot.size / (1024 * 1024)).toFixed(2)} MB
+                      </span>
+                    </div>
+                  </div>
+                )}
+                {screenshotError && (
+                  <p role="alert" className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-rose-600">
+                    <AlertCircle size={14} /> {screenshotError}
+                  </p>
+                )}
+                <p className="mt-2 text-xs text-slate-400">Never upload PINs, passwords, or OTPs.</p>
+              </div>
             </div>
           </section>
         </div>
